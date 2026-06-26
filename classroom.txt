@@ -1,0 +1,5 @@
+Name    | Grade
+---------------
+Rui     | 18   
+Nelson  | 17   
+Letícia | 18   
