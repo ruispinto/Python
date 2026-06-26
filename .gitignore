@@ -216,3 +216,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+/.vs/Python.slnx/FileContentIndex/fdda0b90-5903-4cd3-a5a8-e89c16df34dc.vsidx
+/.vs/Python.slnx/v18/.wsuo
+/.vs/Python.slnx/FileContentIndex/0443b9c9-3c22-463e-a0a5-d63165a7b29d.vsidx
+/.vs/Python.slnx/FileContentIndex/60e07abf-ef4e-4499-b506-b3c51e57adf9.vsidx
+*.vsidx
+/.vs
+/.gitignore
+/.gitignore
