@@ -2,7 +2,10 @@ import os
 
 global dict, shopping_cart
 
+# Portuguese VAT default tax is 23%
 VAT_TAX = 23
+
+# initialize the shopping cart as an empty dictionary
 shopping_cart = {}
 
 dict = {
@@ -42,19 +45,19 @@ def add_shopping_cart():
         if cod == "0":
             break
         if cod in dict:
-            qtd = input("Quantity ")
+            qty = input("Quantity ")
             try:
-                qtd = int(qtd)
+                qty = int(qty)
             except:
-                qtd = 1
+                qty = 1
             
-            if cod in shopping_cart or len(shopping_cart) :
+            if cod in shopping_cart:
                 a = shopping_cart[cod]
             else:
                 a = 0
             
-            shopping_cart[cod] = a + qtd
-            #shopping_cart[cod] = qtd
+            shopping_cart[cod] = a + qty
+            #shopping_cart[cod] = qty
 
     return
 
@@ -63,15 +66,18 @@ def empty_shopping_cart():
     return
 
 def view_shopping_cart(op):
+    # always test if the shopping cart is empty, if it is, print a message and return to the menu
     if len(shopping_cart) <= 0:
         empty_shopping_cart()
         return
+    # get the name and vat number of the customer, if the vat number is empty, it will be set to 999999990 (portuguese vat number for none)
     name,vat = get_client_data()
     if (vat[0] == 5 or vat[0] == 6 or vat[0] == 8) and (not vat == "999999990" or not vat == "123456789"):
         dsc_empr = True
     else:
         dsc_empr = False
     
+    # starts adding the lines to print the shopping cart or receipt
     l = "+" + "-" * 67 + "+\n"
     if op == 1:
         t0 = "Shopping cart"
@@ -148,6 +154,7 @@ def view_shopping_cart(op):
     return name,vat, l
 
 def get_client_data():
+    # this function asks for the name and vat number of the customer, if the vat number is empty, it will be set to 999999990 (portuguese vat number for none)
     while True:
         name = input("\nCustomer name ('exit' to return to the menu): ")
         if name is None or len(name.strip()) == 0:
@@ -162,39 +169,43 @@ def get_client_data():
             break
     return name, vat
 
-def close_deal():
+def print_receipt():
+    # always test if the shopping cart is empty, if it is, print a message and return to the menu
     if len(shopping_cart) <= 0:
         empty_shopping_cart()
         return
     
+    # ask for the name and vat number to print the receipt
     name, vat, lines = view_shopping_cart(2)
-    if (vat[0] == 5 or vat[0] == 6 or vat[0] == 8) and (not vat == "999999990" or not vat == "123456789"):
-        dsc_empr = True
-    else:
-        dsc_empr = False
-   
+
+    # test for the file name and write the receipt to a file
     file_name = "receipt.txt"
     if lines is None:
         empty_shopping_cart()
         return
+    # named the variable to file1 to avoid programming language conflicts
     file1 = write_file(file_name, lines)
     if file1:
         print(lines)
     return
 
 def write_file(filename, cont):
+    # try to write the file, if it exists, append the content, otherwise create a new file
     try:
         if not os.path.exists(filename):
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(cont)
+            # removed the following print statement to avoid printing success message
             #print(f"\nContent written to '{filename}' successfully.\n")
         else:
             with open(filename, "a", encoding="utf-8") as f:
                 cont = "\n" + cont
                 f.write(cont)
+            # removed the following print statement to avoid printing success message
             #print(f"\nContent added to file '{filename}' successfully.\n")
         return True
     except Exception as e:
+        # removed the following print statement to avoid printing error message
         #print(f"\nAn error occurred while writing to file '{filename}': {e}\n")
         return False
 
@@ -214,7 +225,7 @@ def main():
                 name, vat, lines = view_shopping_cart(1)
                 print(lines)
             elif opc == 3:
-                close_deal()
+                print_receipt()
         except:
             continue
     print("\n")
