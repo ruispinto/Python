@@ -35,6 +35,7 @@ def menu():
     print("\n1. Add products to shopping cart")
     print("2. View shopping cart")
     print("3. Finalize purchase")
+    print("4. Empty shopping cart")
     print("0. exit")
     return
 
@@ -48,33 +49,46 @@ def add_shopping_cart():
             qty = input("Quantity ")
             try:
                 qty = int(qty)
+                if qty <= 0:
+                    qty = 1
             except:
                 qty = 1
             
+            # check if the product is already in the shopping cart, if it is, add the quantity to the existing quantity, otherwise add the product to the shopping cart with the quantity
             if cod in shopping_cart:
                 a = shopping_cart[cod]
             else:
                 a = 0
             
+            # add the product to the shopping cart with the quantity
             shopping_cart[cod] = a + qty
-            #shopping_cart[cod] = qty
 
     return
 
-def empty_shopping_cart():
+def msg_empty_shopping_cart():
     print("\nEmpty shopping cart\n")
+    return
+
+def empty_shopping_cart():
+    shopping_cart.clear()
+    print("\nShopping cart emptied\n")
     return
 
 def view_shopping_cart(op):
     # always test if the shopping cart is empty, if it is, print a message and return to the menu
     if len(shopping_cart) <= 0:
-        empty_shopping_cart()
+        msg_empty_shopping_cart()
         return
     # get the name and vat number of the customer, if the vat number is empty, it will be set to 999999990 (portuguese vat number for none)
-    name,vat = get_client_data()
-    if (vat[0] == 5 or vat[0] == 6 or vat[0] == 8) and (not vat == "999999990" or not vat == "123456789"):
-        dsc_empr = True
+    if op == 2:
+        name,vat = get_client_data()
+        if (vat[0] == 5 or vat[0] == 6 or vat[0] == 8) and (not vat == "999999990" or not vat == "123456789"):
+            dsc_empr = True
+        else:
+            dsc_empr = False
     else:
+        name = "Final Consumer"
+        vat = "999999990"
         dsc_empr = False
     
     # starts adding the lines to print the shopping cart or receipt
@@ -87,6 +101,7 @@ def view_shopping_cart(op):
     l += f"| {t0.ljust(65)} |\n"
     l += "|" + " " * 67 + "|\n"
     l += "+" + "-" * 67 + "+\n"
+    l += "|" + " " * 67 + "|\n"
     t0 = "Name: " + name
     l += f"| {t0.ljust(65)} |\n"
     t0 = "Vat number: " + vat
@@ -132,7 +147,8 @@ def view_shopping_cart(op):
     t5b = "Sub-total with discount"
     t6 = "VAT Tax at " + str(VAT_TAX) + "%"
     t7 = "Total of shopping cart (with VAT Tax)"
-    l += f"| {t5.rjust(48)} | {str(st).rjust(10)} Eur |\n"
+    stf = f"{st:.2f}"
+    l += f"| {t5.rjust(48)} | {str(stf).rjust(10)} Eur |\n"
     if dsc > 0:
         dscf = f"{dsc:.2f}"
         stcd = st - dsc
@@ -145,7 +161,6 @@ def view_shopping_cart(op):
     else:
         sti = float(st * (VAT_TAX / 100))
         ti = st + sti
-    st1 = f"{st:.2f}"
     stif = f"{sti:.2f}"
     tif = f"{ti:.2f}"
     l += f"| {t6.rjust(48)} | {str(stif).rjust(10)} Eur |\n"
@@ -172,7 +187,7 @@ def get_client_data():
 def print_receipt():
     # always test if the shopping cart is empty, if it is, print a message and return to the menu
     if len(shopping_cart) <= 0:
-        empty_shopping_cart()
+        msg_empty_shopping_cart()
         return
     
     # ask for the name and vat number to print the receipt
@@ -181,11 +196,12 @@ def print_receipt():
     # test for the file name and write the receipt to a file
     file_name = "receipt.txt"
     if lines is None:
-        empty_shopping_cart()
+        msg_empty_shopping_cart()
         return
     # named the variable to file1 to avoid programming language conflicts
     file1 = write_file(file_name, lines)
     if file1:
+        print("\nReceipt written to file 'receipt.txt' successfully.\n")
         print(lines)
     return
 
@@ -226,6 +242,8 @@ def main():
                 print(lines)
             elif opc == 3:
                 print_receipt()
+            elif opc == 4:
+                empty_shopping_cart()
         except:
             continue
     print("\n")
