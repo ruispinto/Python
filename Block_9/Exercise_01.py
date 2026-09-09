@@ -1,9 +1,23 @@
 import os
+import requests
 
 global dict, shopping_cart
 
 # Portuguese VAT default tax is 23%
 VAT_TAX = 23
+
+# nif.pt free webservice, used to check if a VAT number actually exists.
+# Request a free API key at: https://www.nif.pt/contactos/api/
+# Leave as None to skip the online check and rely on local format validation only.
+NIF_PT_API_KEY = None
+NIF_PT_ENDPOINT = "https://www.nif.pt/"
+
+# Valid first digit(s) for a Portuguese VAT number (simplified reference list)
+VALID_NIF_PREFIXES = (
+    "1", "2", "3", "45", "5", "6",
+    "70", "71", "72", "74", "75", "77", "78", "79",
+    "8", "90", "91", "98", "99",
+)
 
 # initialize the shopping cart as an empty dictionary
 shopping_cart = {}
@@ -82,7 +96,7 @@ def view_shopping_cart(op):
     # get the name and vat number of the customer, if the vat number is empty, it will be set to 999999990 (portuguese vat number for none)
     if op == 2:
         name,vat = get_client_data()
-        if (vat[0] == 5 or vat[0] == 6 or vat[0] == 8) and (not vat == "999999990" or not vat == "123456789"):
+        if (vat[0] in ["5", "6", "8"]) and (vat in ["999999990", "123456789"]):
             dsc_empr = True
         else:
             dsc_empr = False
@@ -125,16 +139,12 @@ def view_shopping_cart(op):
         l +=f"| {a.ljust(27)} | {str(c).rjust(8)} Eur | {str(b).rjust(3)} | {str(d).rjust(10)} Eur |\n"
 
     if st >= 800.0:
-        e = 1
-        f = 0
         if dsc_empr:
             dsc = st * .1
         else:
             dsc = st * 0
         l += f"| {t6.ljust(65)} |\n"
     elif st >= 500.0:
-        e = 1
-        f = 0
         if dsc_empr:
             dsc = st * .1
         else:
@@ -169,7 +179,6 @@ def view_shopping_cart(op):
     return name,vat, l
 
 def get_client_data():
-    # this function asks for the name and vat number of the customer, if the vat number is empty, it will be set to 999999990 (portuguese vat number for none)
     while True:
         name = input("\nCustomer name ('exit' to return to the menu): ")
         if name is None or len(name.strip()) == 0:
@@ -178,9 +187,20 @@ def get_client_data():
         elif name == "exit":
             return
         else:
-            vat = input("VAT Number: ")
-            if vat == "":
-                vat = "999999990"
+            while True:
+                vat = input("VAT Number: ")
+                if vat == "":
+                    vat = "999999990"
+                    break
+                if not validate_nif_format(vat):
+                    print("Invalid VAT number (failed format/check digit validation). Please try again.\n")
+                    continue
+                if NIF_PT_API_KEY:
+                    exists = check_nif_exists(vat, NIF_PT_API_KEY)
+                    if exists is False:
+                        print("This VAT number was not confirmed by nif.pt. Please check it.\n")
+                        continue
+                break
             break
     return name, vat
 
@@ -224,6 +244,38 @@ def write_file(filename, cont):
         # removed the following print statement to avoid printing error message
         #print(f"\nAn error occurred while writing to file '{filename}': {e}\n")
         return False
+
+# function to validate the NIF format and check digit locally
+def validate_nif_format(nif):
+    # validates the NIF format and check digit locally
+    # this does NOT confirm the NIF is registered, only that it is well-formed
+    nif = nif.strip()
+
+    if not nif.isdigit() or len(nif) != 9:
+        return False
+
+    if not nif.startswith(VALID_NIF_PREFIXES):
+        return False
+
+    total = sum(int(d) * w for d, w in zip(nif[:8], range(9, 1, -1)))
+    remainder = total % 11
+    check_digit = 0 if remainder < 2 else 11 - remainder
+
+    return check_digit == int(nif[8])
+
+
+def check_nif_exists(nif, api_key):
+    # queries the nif.pt webservice to check if the NIF is actually registered
+    # returns True / False, or None if the service could not be reached
+    try:
+        params = {"json": 1, "q": nif, "key": api_key}
+        response = requests.get(NIF_PT_ENDPOINT, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        return bool(data.get("nif_validation"))
+    except requests.RequestException:
+        # if the service is unreachable, don't block the user - just skip the online check
+        return None
 
 
 def main():
