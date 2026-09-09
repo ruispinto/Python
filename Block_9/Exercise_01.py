@@ -79,6 +79,7 @@ def view_shopping_cart(op):
         t0 = "RECEIPT"
     l += "|" + " " * 67 + "|\n"
     l += f"| {t0.ljust(65)} |\n"
+    l += "|" + " " * 67 + "|\n"
     l += "+" + "-" * 67 + "+\n"
     t0 = "Name: " + name
     l += f"| {t0.ljust(65)} |\n"
