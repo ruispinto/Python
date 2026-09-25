@@ -128,7 +128,7 @@ def view_shopping_cart(op):
     t3 = "Qty"
     t4 = "Total"
     t5 = "Special discount of 2% for values above 500 Eur"
-    t6 = "Offer of a night at a hotel from the Pestana Group"
+    t6 = "Offer of a night at the Pestana Group Hotel"
     l += f"| {t1.ljust(27)} | {t2.ljust(12)} | {t3.ljust(3)} | {t4.ljust(14)} |\n"
     l += "+" + "-" * 29 + "+" + "-" * 14 + "+" + "-" * 5 + "+" + "-" * 16 + "+\n"
     st = 0.0
