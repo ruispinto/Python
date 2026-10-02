@@ -1,4 +1,3 @@
-import re
 from datetime import datetime
 
 if __name__ == "__main__":
@@ -38,11 +37,11 @@ if __name__ == "__main__":
                 msg_code = int(pieces[-2])
 
                 # determine the severity code based on the message code
-                if 200 <= msg_code <= 399:
+                if msg_code <= 399:
                     severity_code = "INFO"
-                elif 400 <= msg_code <= 499:
+                elif msg_code <= 499:
                     severity_code = "WARNING"
-                elif 500 <= msg_code <= 599:
+                elif msg_code <= 599:
                     severity_code = "ERROR"
 
                 # get the timestamp from the fourth and fifth pieces of the line, remove the brackets, and join them to form a timestamp string
