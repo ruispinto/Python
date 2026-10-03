@@ -1,6 +1,6 @@
 import re
 
-file_name = "c:\log_simulado 1.log"
+file_name = "c:\\tmp\\log_simulado 1.log"
 
 try:
     with open(file_name, "r", encoding="utf-8") as f:

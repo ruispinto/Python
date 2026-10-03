@@ -1,9 +1,11 @@
 from datetime import datetime
 
 if __name__ == "__main__":
+    # get a file name from the user, or use a default file name if the user does not provide one
     file_name = input()
     if file_name.strip() == "": file_name = "c:\\tmp\\logs_mistos.log"
 
+    # open the file and read its contents into a list of lines, handling any errors that may occur
     try:
         with open(file_name, "r", encoding="utf-8") as f:
             lines = f.readlines()
@@ -13,7 +15,7 @@ if __name__ == "__main__":
 
     else:
         # initialize counters for syslog and apache entries
-        syslog_counter = apache_counter = 0
+        syslog_counter = apache_counter = other = 0
         # iterate through each line in the log file
         for line in lines:
             # split the line into pieces based on whitespace
