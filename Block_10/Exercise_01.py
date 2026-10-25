@@ -25,7 +25,7 @@ if __name__ == "__main__":
             # regex to apply (not necessary): \b(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\b
             #syslog_log = re.search(r"\b(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\b", line)
 
-            if syslog_log:
+            if syslog:
                 
                 # could use the regex group to extract the timestamp, but instead I will split the line and join the first two pieces to form the timestamp string
                 #result = datetime.datetime.strptime(s.group(1),"%Y-%m-%d %H:%M:%S")
