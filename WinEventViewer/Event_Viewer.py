@@ -15,8 +15,10 @@ def read_events(log_name="System", limits=100):
         all_events = win32evtlog.ReadEventLog(
             handle, flags, 0
         )
+
         all = ""
         ev = {}
+
         counter = 0
         for e in all_events[:limits]:
             counter += 1
@@ -54,6 +56,7 @@ def read_events(log_name="System", limits=100):
 if __name__ == "__main__":
     read_events("System", 100)
     read_events("Application", 100)
+    #read_events("Security", 100)
     input("Press Enter to exit...")
     # Also you can test "Application"
     # or "Security" (may require additional permissions).
